@@ -138,13 +138,16 @@ void printInOrder(Node* root, string prefix = "", bool isLeft = true) const {
 //Implementacion en el main
 
 int main() {
-
+    char seguir;
+    do {
     // Configurar la consola para usar UTF-8
     SetConsoleOutputCP(CP_UTF8); // Establece la salida en UTF-8, caracteres especiales en español
     SetConsoleCP(CP_UTF8);       // Establece la entrada en UTF-8, caracteres especiales en español
 
     arbolAVL<int> avl;
-
+    cout <<"\n";
+    cout<< "***Programa de arbol AVL***\n";
+    cout <<"\n";
     cout << "Insertando nodos en el árbol AVL:\n";
     avl.insert(40);
     cout << "Nodo 40 insertado.\n";
@@ -175,6 +178,9 @@ int main() {
 
     cout << "\nÁrbol AVL después de eliminar el nodo 20 (en orden):\n";
     avl.print();
-
+    cout<<"Programa terminado, quiere salir? (s/n).\n";
+    cin >> seguir;
+    } while (seguir != 's' && seguir != 'S');
+    cout << "Programa terminado.\n";
     return 0;
 }
