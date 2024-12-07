@@ -1,7 +1,7 @@
 1. Realizar una plantilla de árbol binario que se autobalance al insertar o eliminar un nodo de manera no recursiva. Realizar un programa donde se vea el uso de dicha plantilla.
  
-* no necesariamente tiene que ser un .csv
-* tiene que tener un output manejado por el usuario (a menos que sea el menú para que el .EXE no se detenga)
+* NO tiene que ser un .csv
+* NO tiene que tener un output manejado por el usuario (a menos que sea el menú para que el .EXE no se detenga)
 Implementar funciones de:
 A. mostrar árbol.
 B. ingresar nodos.

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <windows.h>
 using namespace std;
 
 // Clase para arbol autobalanceado (AVL)
@@ -107,13 +108,15 @@ class arbolAVL {
         if (!root) return root;
         return balance(root);
     }
-    // Imprimir el arbol
-    void printInOrder(Node* node) {
-        if (!node) return;
-        printInOrder(node->left);
-        cout << node->data << " ";
-        printInOrder(node->right);
-    }
+    // Imprimir el arbol en orden
+void printInOrder(Node* root, string prefix = "", bool isLeft = true) const {
+    if (root == NULL) return;
+    cout << prefix << (isLeft ? "|-- " : "L-- ") << root->data << "\n";
+    printInOrder(root->left, prefix + (isLeft ? "|   " : "    "), true);
+    printInOrder(root->right, prefix + (isLeft ? "|   " : "    "), false);
+}
+  
+
     public: 
     // Constructor del arbol
     arbolAVL() : root (NULL) {}
@@ -135,15 +138,43 @@ class arbolAVL {
 //Implementacion en el main
 
 int main() {
-    arbolAVL<int> arbol;
-    arbol.insert(10);
-    arbol.insert(20);
-    arbol.insert(5);
-    arbol.insert(6);
-    arbol.insert(8);
-    arbol.insert(3);
-    arbol.print();
-    arbol.deleteNode(10);
-    arbol.print();
+
+    // Configurar la consola para usar UTF-8
+    SetConsoleOutputCP(CP_UTF8); // Establece la salida en UTF-8, caracteres especiales en español
+    SetConsoleCP(CP_UTF8);       // Establece la entrada en UTF-8, caracteres especiales en español
+
+    arbolAVL<int> avl;
+
+    cout << "Insertando nodos en el árbol AVL:\n";
+    avl.insert(40);
+    cout << "Nodo 40 insertado.\n";
+    avl.insert(20);
+    cout << "Nodo 20 insertado.\n";
+    avl.insert(60);
+    cout << "Nodo 60 insertado.\n";
+    avl.insert(10);
+    cout << "Nodo 10 insertado.\n";
+    avl.insert(30);
+    cout << "Nodo 30 insertado.\n";
+    avl.insert(50);
+    cout << "Nodo 50 insertado.\n";
+    avl.insert(70);
+    cout << "Nodo 70 insertado.\n";
+    avl.insert(5);
+    cout << "Nodo 5 insertado.\n";
+    avl.insert(15);
+    cout << "Nodo 15 insertado.\n";
+    avl.insert(25);
+    cout << "Nodo 25 insertado.\n";
+
+    cout << "\nÁrbol AVL después de las inserciones (en orden):\n";
+    avl.print();
+
+    cout << "\nEliminando nodo 20 del árbol AVL.\n";
+    avl.deleteNode(20);
+
+    cout << "\nÁrbol AVL después de eliminar el nodo 20 (en orden):\n";
+    avl.print();
+
     return 0;
 }
