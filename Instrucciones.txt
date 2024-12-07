@@ -1,5 +1,7 @@
 2. Realizar un programa que permita registrar el arbol genealogico de una persona a partir de un .csv en un árbol. La raiz del arbol es la persona que quiere realizar el arbol. Los hermanos se guardan en una lista en el nodo correspondiente. No incluir primos.
 
+*Se tiene que tener un archivo.CSV previo.
+
 *Solo puede ser un archivo.CSV, no se pueden crear mas.
 
 *El archivo tiene que tener los headers incluidos de forma obligatoria.

@@ -1,0 +1,8 @@
+name;parent;sibling
+Juan;;;
+Maria;Juan;
+Pedro;Juan;Maria
+Luis;Pedro;
+Ana;Pedro;Luis
+Carlos;Maria;
+Sofia;Carlos;
