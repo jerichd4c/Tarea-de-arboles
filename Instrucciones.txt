@@ -1,0 +1,26 @@
+1. Realizar una plantilla de árbol binario que se autobalance al insertar o eliminar un nodo de manera no recursiva. Realizar un programa donde se vea el uso de dicha plantilla.
+ 
+* no necesariamente tiene que ser un .csv
+* tiene que tener un output manejado por el usuario (a menos que sea el menú para que el .EXE no se detenga)
+Implementar funciones de:
+A. mostrar árbol.
+B. ingresar nodos.
+C. eliminar nodos.
+
+2. Realizar un programa que permita registrar el arbol genealogico de una persona a partir de un .csv en un árbol. La raiz del arbol es la persona que quiere realizar el arbol. Los hermanos se guardan en una lista en el nodo correspondiente. No incluir primos.
+
+*Solo puede ser un archivo.CSV, no se pueden crear mas.
+
+*El archivo tiene que tener los headers incluidos de forma obligatoria.
+
+*Este árbol no requiere que se autobalancee ya que rompería la lógica de los hermanos.
+
+CONSIDERACIONES:
+
+1.tiene que tener un menú con el input del usuario, hasta que el usuario diga tiene que seguir ejecutándose.
+
+2.el programa tiene que ser capaz de manejar archivos ordenados y desordenados.
+
+3.no se pueden usar: vectores (librería <vectors>), <queue>, <stack>, <map>, <unordered_map> y cualquier otra libreria de este tipo.
+
+4.el programa tiene que ser capaz de tener capacidad infinita, es decir, trabajar con punteros y arreglos dinámicos.
