@@ -12,16 +12,11 @@ NOTA: cuando se refiere a los hermanos se guardan en una lista en el nodo corres
 
 COSAS A AGREGAR:
 
-Agregarle: IDs únicos a los familiares para diferenciarlos del uno al otro, en el caso del primer familiar del árbol genealogico, tiene un ID fijo.
-	* En el caso de que el usuario agarre un ID ya seleccionado, tirar un output que ya esta usado (aplica tanto a modificar nodos y agregar nodos). LISTO
+Arreglar: En el caso de que el usuario seleccione un padre con un hermano pero no seleccione un hermano asignarle el hermano que tiene el padre (el programa crashea). LISTO
 
-Arreglar: En el caso de que el usuario seleccione un padre con un hermano pero no seleccione un hermano asignarle el hermano que tiene el padre (el programa crashea).
+AGREGARLE: FUNCION PARA ACTUALIZAR ARCHIVO NO ESTA (esta función tiene que trabajar siempre con el mismo archivo).
 
-Agregarle: agregarle un campo de ID al .csv (este campo no se puede modificar) LISTO
-
-AGREGARLE: FUNCION PARA ACTUALIZAR ARCHIVO NO ESTA
-
-Cambiar: hacer que el usuario seleccione el archivo en vez de que tenga que escribir el nombre.
+Cambiar: hacer que el usuario seleccione el archivo en vez de que tenga que escribir el nombre. LISTO
 
 GITHUB:
 

@@ -228,28 +228,51 @@ void addFamilyMember(Node* root, int id, const string& name, const string& paren
         return;
     }
 
+    Node* parent = nullptr;
+    Node* sibling = nullptr;
+
+    // Validar que el padre exista si se proporciona un nombre de padre
+    if (!parentName.empty()) {
+        parent = findNodeByName(root, parentName);
+        if (!parent) {
+            cout << "El padre especificado no existe." << endl;
+            return;
+        }
+    }
+
+    // Validar que el hermano exista si se proporciona un nombre de hermano
+    if (!siblingName.empty()) {
+        sibling = findNodeByName(root, siblingName);
+        if (!sibling) {
+            cout << "El hermano especificado no existe." << endl;
+            return;
+        }
+
+        // Validar que el hermano tenga el mismo padre especificado, si se proporciona un nombre de padre
+        if (parent && sibling->parent != parent) {
+            cout << "El hermano especificado no tiene el mismo padre que el proporcionado." << endl;
+            return;
+        }
+    }
+
     Node* newNode = new Node(id, name);
 
     // Añadir hijo
-    if (!parentName.empty()) {
-        Node* parent = findNodeByName(root, parentName);
-        if (parent) {
-            addChild(parent, newNode);
-        }
+    if (parent) {
+        addChild(parent, newNode);
     }
 
     // Añadir hermano
-    if (!siblingName.empty()) {
-        Node* sibling = findNodeByName(root, siblingName);
-        if (sibling) {
-            addSibling(sibling, newNode);
-        }
+    if (sibling) {
+        addSibling(sibling, newNode);
     }
 
-    if (parentName.empty() && siblingName.empty()) {
-        // Si el nodo no tiene padres ni hermanos, es una nueva raíz
+    // Establecer la raíz si no hay padre ni hermano
+    if (!parent && !sibling) {
         root = newNode;
     }
+
+    cout << "Familiar agregado exitosamente." << endl;
 }
 
 // Funcion para mostrar el menu
@@ -315,9 +338,7 @@ int main() {
     SetConsoleOutputCP(CP_UTF8); // Establece la salida en UTF-8, caracteres especiales en español
     SetConsoleCP(CP_UTF8);       // Establece la entrada en UTF-8, caracteres especiales en español
     
-    string filename;
-    cout << "Ingrese el nombre del archivo CSV: ";
-    cin >> filename;
+    string filename = "arbolGenealogico.csv";
 
     Node* root = buildTreeFromCSV(filename);
 
