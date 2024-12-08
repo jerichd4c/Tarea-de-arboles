@@ -49,15 +49,15 @@ void addChild(Node* parent, Node* child) {
 
 // Función para añadir un hermano a un nodo
 void addSibling(Node* node, Node* sibling) {
-    while (node->sibling != nullptr) {
-        node = node->sibling;
+    if (node == nullptr || sibling == nullptr) return;
+    Node* current = node;
+    while (current->sibling != nullptr) {
+        current = current->sibling;
     }
-    node->sibling = sibling; // Añadir el nuevo hermano al final de la lista de hermanos
-    sibling->sibling = nullptr; // Asegurar que el nuevo hermano no tenga un siguiente hermano
+    current->sibling = sibling;
 }
 
-// Funcion para agregar datos al .CSV
-
+// Función para construir el árbol desde un archivo CSV
 Node* buildTreeFromCSV(const string& filename) {
     ifstream file(filename);
     if (!file.is_open()) {
@@ -68,23 +68,8 @@ Node* buildTreeFromCSV(const string& filename) {
     string line;
     getline(file, line); // Leer headers
 
-    // Validar encabezados
-    stringstream headerStream(line);
-    string headers[4];
-    int headerIndex = 0;
-    while (headerIndex < 4 && getline(headerStream, headers[headerIndex], ';')) {
-        headerIndex++;
-    }
-
-    // Orden del encabezado: id, name, parent, sibling
-    if (headerIndex < 4 || headers[0] != "id" || headers[1] != "name" || headers[2] != "parent" || headers[3] != "sibling") {
-        cerr << "Encabezados del archivo CSV inválidos." << endl;
-        file.close();
-        return nullptr;
-    }
-
     Node* root = nullptr;
-    Node** nodes = new Node*[100]; // Arreglo para almacenar nodos (ajustar tamaño según necesidad)
+    Node** nodes = new Node*[100]; // Arreglo para almacenar nodos
     int nodeCount = 0;
 
     while (getline(file, line)) {
@@ -157,27 +142,27 @@ void resetPrintedFlags(Node* node) {
 
 // Funcion para imprimir el arbol
 
-void printTree(Node* root, int depth = 0, bool isSibling = false, string prefix = "") {
+void printTree(Node* root, int depth = 0, string prefix = "") {
     if (root && !root->printed) {
         root->printed = true; // Marcar el nodo como impreso
-        cout << prefix;
-        if (isSibling) {
-            cout << "|-- ";
-        } else {
-            cout << "+-- ";
-        }
-        // Mostrar el nombre y el ID del nodo
-        cout << root->name << " (ID: " << root->id << ")" << endl;
 
-        string childPrefix = prefix + (isSibling ? "|   " : "    ");
+        // Mostrar el nombre y el ID del nodo con el prefijo adecuado
+        cout << prefix << "+-- " << root->name << " (ID: " << root->id << ")" << endl;
+
+        string childPrefix = prefix + "|   ";
+
         // Imprimir todos los hijos primero
         for (int i = 0; i < root->numChildren; ++i) {
-            printTree(root->children[i], depth + 1, false, childPrefix);
+            if (i == root->numChildren - 1) {
+                printTree(root->children[i], depth + 1, prefix + "    ");
+            } else {
+                printTree(root->children[i], depth + 1, childPrefix);
+            }
         }
 
         // Luego imprimir los hermanos
         if (root->sibling) {
-            printTree(root->sibling, depth, true, prefix);
+            printTree(root->sibling, depth, prefix);
         }
     }
 }

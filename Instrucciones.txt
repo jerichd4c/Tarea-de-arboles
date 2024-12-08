@@ -10,10 +10,6 @@ NOTA: cuando se refiere a los hermanos se guardan en una lista en el nodo corres
 
 *Este árbol no requiere que se autobalancee ya que rompería la lógica de los hermanos. LISTO 
 
-COSAS A AGREGAR:
-
-Arreglar: el programa actualiza los campos de sibling, sin embargo estos se actualizan de manera errónea, es decir hay campos con hermanos erróneos.
-
 GITHUB:
 
 Agregarle: tener la estructura de carpetas necesarias "src" y "bin"
