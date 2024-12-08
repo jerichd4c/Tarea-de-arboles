@@ -12,7 +12,7 @@ NOTA: cuando se refiere a los hermanos se guardan en una lista en el nodo corres
 
 COSAS A AGREGAR:
 
-Arreglar: función UpdateCSV borra el campo de los hermanos en el CSV.
+Arreglar: el programa actualiza los campos de sibling, sin embargo estos se actualizan de manera errónea, es decir hay campos con hermanos erróneos.
 
 GITHUB:
 

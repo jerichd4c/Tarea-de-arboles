@@ -47,13 +47,13 @@ void addChild(Node* parent, Node* child) {
     child->parent = parent;
 }
 
-// Funcion para añadir un hermano a un nodo
-
+// Función para añadir un hermano a un nodo
 void addSibling(Node* node, Node* sibling) {
     while (node->sibling != nullptr) {
         node = node->sibling;
     }
     node->sibling = sibling; // Añadir el nuevo hermano al final de la lista de hermanos
+    sibling->sibling = nullptr; // Asegurar que el nuevo hermano no tenga un siguiente hermano
 }
 
 // Funcion para agregar datos al .CSV
@@ -228,7 +228,7 @@ void modifyFamilyMember(Node* root, int id, const string& newName) {
     }
 }
 
-// Funcion para agregar el nodo
+// Funcion para agregar un nuevo familiar
 
 void addFamilyMember(Node*& root, int id, const string& name, const string& parentName, const string& siblingName) {
     cout << "Agregando familiar con ID: " << id << ", Nombre: " << name << endl;
@@ -295,7 +295,7 @@ void addFamilyMember(Node*& root, int id, const string& name, const string& pare
     cout << "Familiar agregado exitosamente." << endl;
 }
 
-// Funcion auxiliar para guardar nodo en el arbol
+// Función auxiliar para escribir nodo en el archivo
 
 void writeNode(ofstream& file, Node* node) {
     if (node) {
@@ -310,7 +310,6 @@ void writeNode(ofstream& file, Node* node) {
 }
 
 // Función para guardar el árbol en un archivo CSV ordenado por ID
-
 void saveTreeToCSV(Node* root, const string& filename) {
     cout << "Guardando árbol en archivo CSV..." << endl;
     ofstream file(filename);
@@ -353,7 +352,7 @@ void saveTreeToCSV(Node* root, const string& filename) {
         string parentName = (node->parent) ? node->parent->name : "";
         string siblingName = (node->sibling) ? node->sibling->name : "";
         file << node->id << ";" << node->name << ";" << parentName << ";" << siblingName << "\n";
-        cout << "Escribiendo nodo - ID: " << node->id << ", Nombre: " << node->name << endl;
+        cout << "Escribiendo nodo - ID: " << node->id << ", Nombre: " << node->name << ", Hermano: " << siblingName << endl;
     }
 
     // Liberar memoria
@@ -363,35 +362,32 @@ void saveTreeToCSV(Node* root, const string& filename) {
     cout << "Árbol guardado exitosamente." << endl;
 }
 
-
 // Función auxiliar para contar todos los nodos
 
 void countNodes(Node* node, int& count) {
-    if (node && !node->printed) {  // Solo contar nodos no impresos
+    if (node && !node->printed) {
         count++;
-        node->printed = true;  // Marcar el nodo como procesado para no contarlo de nuevo
+        node->printed = true;
         for (int i = 0; i < node->numChildren; ++i) {
             countNodes(node->children[i], count);
         }
-        if (node->sibling) {
-            countNodes(node->sibling, count);
-        }
+    }
+    if (node->sibling) {
+        countNodes(node->sibling, count);
     }
 }
 
-
 // Función auxiliar para recopilar nodos en un arreglo dinámico sin duplicados
-
 void collectNodes(Node* node, Node** nodes, int& index) {
-    if (node && !node->printed) {  // Solo recopilar nodos no impresos
+    if (node && !node->printed) {
         nodes[index++] = node;
-        node->printed = true;  // Marcar el nodo como procesado para no recopilarlo de nuevo
+        node->printed = true;
         for (int i = 0; i < node->numChildren; ++i) {
             collectNodes(node->children[i], nodes, index);
         }
-        if (node->sibling) {
-            collectNodes(node->sibling, nodes, index);
-        }
+    }
+    if (node->sibling) {
+        collectNodes(node->sibling, nodes, index);
     }
 }
 
