@@ -12,9 +12,7 @@ NOTA: cuando se refiere a los hermanos se guardan en una lista en el nodo corres
 
 COSAS A AGREGAR:
 
-Arreglar: función modificar nodo no puede modificar el ID puesto a ser único.
-
-AGREGARLE: FUNCION PARA ACTUALIZAR ARCHIVO NO ESTA (esta función tiene que trabajar siempre con el mismo archivo). LISTO
+Arreglar: función modificar y agregar nodo modifican el orden de los IDs de forma incorrecta.
 
 GITHUB:
 

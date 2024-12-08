@@ -212,16 +212,9 @@ Node* findNodeByName(Node* root, const string& name) {
 
 // Funcion para modificar un nodo del arbol
 
-void modifyFamilyMember(Node* root, int oldId, int newId, const string& newName) {
-    Node* node = findNodeById(root, oldId);
+void modifyFamilyMember(Node* root, int id, const string& newName) {
+    Node* node = findNodeById(root, id);
     if (node) {
-        // Verificar si el nuevo ID ya está en uso
-        if (newId != oldId && findNodeById(root, newId)) {
-            cout << "ID ya está en uso. Por favor, elija otro ID." << endl;
-            return;
-        }
-        // Modificar el nodo con el nuevo ID y nombre
-        node->id = newId;
         node->name = newName;
 
         // Guardar el árbol actualizado en el archivo CSV
@@ -325,12 +318,14 @@ void saveTreeToCSV(Node* root, const string& filename) {
 
 // Funcion para mostrar el menu
 
+// Funcion para mostrar el menu
+
 void menu(Node* root) {
     int option = 0;
     while (option != 4) {
         cout << "1. Imprimir árbol" << endl;
         cout << "2. Agregar familiar" << endl;
-        cout << "3. Modificar familiar" << endl;
+        cout << "3. Modificar nombre del familiar" << endl; // Cambiar el texto para reflejar que solo se puede modificar el nombre
         cout << "4. Salir" << endl;
         cout << "Seleccione una opción: ";
         cin >> option;
@@ -347,25 +342,23 @@ void menu(Node* root) {
             cin >> id;
             cout << "Ingrese el nombre del nuevo familiar: ";
             cin >> name;
-            cout << "Ingrese el nombre del padre (dejar en blanco si no aplica): ";
+            cout << "Ingrese el nombre del padre: ";
             cin.ignore(); // Para evitar problemas al leer nombres con espacios
             getline(cin, parentName);
-            cout << "Ingrese el nombre del hermano (dejar en blanco si no aplica): ";
+            cout << "Ingrese el nombre del hermano (dejar en blanco si es hijo unico): ";
             getline(cin, siblingName);
-            addFamilyMember(root, id, name, parentName, siblingName);
+            addFamilyMember(root, id, name, parentName, siblingName); // No pedimos el nombre del hermano
             break;
         }
         case 3: {
-            int oldId, newId;
+            int id;
             string newName;
-            cout << "Ingrese el ID actual del familiar: ";
-            cin >> oldId;
-            cout << "Ingrese el nuevo ID del familiar: ";
-            cin >> newId;
+            cout << "Ingrese el ID del familiar a modificar: ";
+            cin >> id;
             cout << "Ingrese el nuevo nombre del familiar: ";
             cin.ignore(); // Para evitar problemas al leer nombres con espacios
             getline(cin, newName);
-            modifyFamilyMember(root, oldId, newId, newName);
+            modifyFamilyMember(root, id, newName); // Solo modificamos el nombre, no el ID
             break;
         }
         case 4:
