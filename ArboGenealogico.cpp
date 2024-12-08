@@ -2,8 +2,11 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <windows.h>
 
 using namespace std;
+
+// Clase para nodo (familiar) del arbol
 
 struct Node {
     string name;
@@ -11,9 +14,12 @@ struct Node {
     Node* sibling;
     Node** children;
     int numChildren;
+    bool printed;
 
-    Node(string n) : name(n), parent(nullptr), sibling(nullptr), children(nullptr), numChildren(0) {}
+    Node(string n) : name(n), parent(nullptr), sibling(nullptr), children(nullptr), numChildren(0), printed(false) {}
 };
+
+// Funcion para añadir un hijo a un nodo
 
 void addChild(Node* parent, Node* child) {
     if (parent->numChildren == 0) {
@@ -30,12 +36,16 @@ void addChild(Node* parent, Node* child) {
     child->parent = parent;
 }
 
+// Funcion para añadir un hermano a un nodo
+
 void addSibling(Node* node, Node* sibling) {
     while (node->sibling != nullptr) {
         node = node->sibling;
     }
-    node->sibling = sibling;
+    node->sibling = sibling; // Añadir el nuevo hermano al final de la lista de hermanos
 }
+
+// Funcion para agregar datos al .CSV
 
 Node* buildTreeFromCSV(const string& filename) {
     ifstream file(filename);
@@ -55,7 +65,7 @@ Node* buildTreeFromCSV(const string& filename) {
         headerIndex++;
     }
 
-    // Esperamos encabezados en el siguiente orden: name, parent, sibling
+    // Orden del encabezado: name, parent, sibling
     if (headerIndex < 3 || headers[0] != "name" || headers[1] != "parent" || headers[2] != "sibling") {
         cerr << "Encabezados del archivo CSV inválidos." << endl;
         file.close();
@@ -75,6 +85,7 @@ Node* buildTreeFromCSV(const string& filename) {
 
         Node* newNode = new Node(name);
 
+        // Añadir hijo
         if (!parentName.empty()) {
             for (int i = 0; i < nodeCount; ++i) {
                 if (nodes[i]->name == parentName) {
@@ -84,6 +95,7 @@ Node* buildTreeFromCSV(const string& filename) {
             }
         }
 
+        // Añadir hermano
         if (!siblingName.empty()) {
             for (int i = 0; i < nodeCount; ++i) {
                 if (nodes[i]->name == siblingName) {
@@ -93,6 +105,7 @@ Node* buildTreeFromCSV(const string& filename) {
             }
         }
 
+        // Establecer la raíz
         if (nodeCount == 0) {
             root = newNode;
         }
@@ -115,32 +128,135 @@ Node* buildTreeFromCSV(const string& filename) {
     return root;
 }
 
-void printTree(Node* root, int depth = 0) {
-    if (root) {
-        for (int i = 0; i < depth; ++i) cout << "  ";
-        cout << root->name << endl;
-        for (int i = 0; i < root->numChildren; ++i) {
-            printTree(root->children[i], depth + 1);
+// Funcion para asegurarse de que en el arbol no hayan nodos repetidos
+
+void resetPrintedFlags(Node* node) {
+    if (node) {
+        node->printed = false;
+        for (int i = 0; i < node->numChildren; ++i) {
+            resetPrintedFlags(node->children[i]);
         }
-        if (root->sibling) {
-            printTree(root->sibling, depth);
+        if (node->sibling) {
+            resetPrintedFlags(node->sibling);
         }
     }
 }
 
+// Funcion para imprimir el arbol
+
+void printTree(Node* root, int depth = 0, bool isSibling = false, string prefix = "") {
+    if (root && !root->printed) {
+        root->printed = true; // Marcar el nodo como impreso
+        cout << prefix;
+        if (isSibling) {
+            cout << "|-- ";
+        } else {
+            cout << "+-- ";
+        }
+        cout << root->name << endl;
+
+        string childPrefix = prefix + (isSibling ? "|   " : "    ");
+        // Imprimir todos los hijos primero
+        for (int i = 0; i < root->numChildren; ++i) {
+            printTree(root->children[i], depth + 1, false, childPrefix);
+        }
+
+        // Luego imprimir los hermanos
+        if (root->sibling) {
+            printTree(root->sibling, depth, true, prefix);
+        }
+    }
+}
+
+// Funcion para encontrar un nodo y posteriormente agregarlo
+
+Node* findNode(Node* root, const string& name) {
+    if (!root) return nullptr;
+    if (root->name == name) return root;
+    Node* found = nullptr;
+    for (int i = 0; i < root->numChildren && !found; ++i) {
+        found = findNode(root->children[i], name);
+    }
+    if (!found && root->sibling) {
+        found = findNode(root->sibling, name);
+    }
+    return found;
+}
+
+// Funcion para modificar un nodo del arbol
+
+void modifyFamilyMember(Node* root, const string& oldName, const string& newName) {
+    Node* node = findNode(root, oldName);
+    if (node) {
+        node->name = newName;
+    }
+}
+
+// Funcion para agregar el nodo
+
+void addFamilyMember(Node* root, const string& name, const string& parentName, const string& siblingName) {
+    Node* newNode = new Node(name);
+
+    // Añadir hijo
+    if (!parentName.empty()) {
+        Node* parent = findNode(root, parentName);
+        if (parent) {
+            addChild(parent, newNode);
+        }
+    }
+
+    // Añadir hermano
+    if (!siblingName.empty()) {
+        Node* sibling = findNode(root, siblingName);
+        if (sibling) {
+            addSibling(sibling, newNode);
+        }
+    }
+
+    if (parentName.empty() && siblingName.empty()) {
+        // Si el nodo no tiene padres ni hermanos, es una nueva raíz
+        root = newNode;
+    }
+}
+
+// Funcion para mostrar el menu
+
 void menu(Node* root) {
     int option = 0;
-    while (option != 2) {
+    while (option != 4) {
         cout << "1. Imprimir árbol" << endl;
-        cout << "2. Salir" << endl;
+        cout << "2. Agregar familiar" << endl;
+        cout << "3. Modificar familiar" << endl;
+        cout << "4. Salir" << endl;
         cout << "Seleccione una opción: ";
         cin >> option;
 
         switch (option) {
         case 1:
+            resetPrintedFlags(root); // Reseteamos las banderas antes de imprimir
             printTree(root);
             break;
-        case 2:
+        case 2: {
+            string name, parentName, siblingName;
+            cout << "Ingrese el nombre del nuevo familiar: ";
+            cin >> name;
+            cout << "Ingrese el nombre del padre (dejar en blanco si no aplica): ";
+            cin >> parentName;
+            cout << "Ingrese el nombre del hermano (dejar en blanco si no aplica): ";
+            cin >> siblingName;
+            addFamilyMember(root, name, parentName, siblingName);
+            break;
+        }
+        case 3: {
+            string oldName, newName;
+            cout << "Ingrese el nombre actual del familiar: ";
+            cin >> oldName;
+            cout << "Ingrese el nuevo nombre del familiar: ";
+            cin >> newName;
+            modifyFamilyMember(root, oldName, newName);
+            break;
+        }
+        case 4:
             cout << "Saliendo..." << endl;
             break;
         default:
@@ -150,7 +266,14 @@ void menu(Node* root) {
     }
 }
 
+// Implementacion en el main
+
 int main() {
+
+    // Configurar la consola para usar UTF-8
+    SetConsoleOutputCP(CP_UTF8); // Establece la salida en UTF-8, caracteres especiales en español
+    SetConsoleCP(CP_UTF8);       // Establece la entrada en UTF-8, caracteres especiales en español
+    
     string filename;
     cout << "Ingrese el nombre del archivo CSV: ";
     cin >> filename;

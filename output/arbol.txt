@@ -6,3 +6,17 @@ Luis;Pedro;
 Ana;Pedro;Luis
 Carlos;Maria;
 Sofia;Carlos;
+Elena;Carlos;Sofia
+Miguel;Ana;
+Mariana;Ana;Miguel
+Lucas;Luis;
+Nicolas;Luis;Lucas
+Isabel;Pedro;
+Victor;Pedro;Isabel
+Laura;Maria;
+Daniel;Maria;Laura
+Gabriela;Juan;
+Arturo;Gabriela;
+Carmen;Arturo;
+Fernando;Carmen;
+Andrea;Fernando;
