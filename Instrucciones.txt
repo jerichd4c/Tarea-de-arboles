@@ -12,15 +12,22 @@ NOTA: cuando se refiere a los hermanos se guardan en una lista en el nodo corres
 
 COSAS A AGREGAR:
 
-*función para agregar familiares. LISTO
+Agregarle: IDs únicos a los familiares para diferenciarlos del uno al otro, en el caso del primer familiar del árbol genealogico, tiene un ID fijo.
+	* En el caso de que el usuario agarre un ID ya seleccionado, tirar un output que ya esta usado (aplica tanto a modificar nodos y agregar nodos). LISTO
 
-*función para modificar familiares. LISTO
+Arreglar: En el caso de que el usuario seleccione un padre con un hermano pero no seleccione un hermano asignarle el hermano que tiene el padre (el programa crashea).
 
-*mejorar el output del árbol para que se pueda ver mejor la relación padre e hijos e padres-hermanos. LISTO
+Agregarle: agregarle un campo de ID al .csv (este campo no se puede modificar) LISTO
 
-*agregar cometarios para diferenciar funciones. LISTO
+AGREGARLE: FUNCION PARA ACTUALIZAR ARCHIVO NO ESTA
 
-*expandir CSV para casos mas complejos. LISTO
+Cambiar: hacer que el usuario seleccione el archivo en vez de que tenga que escribir el nombre.
+
+GITHUB:
+
+Agregarle: tener la estructura de carpetas necesarias "src" y "bin"
+
+Agregarle: README indicando las instrucciones del programa.
  
 CONSIDERACIONES:
 

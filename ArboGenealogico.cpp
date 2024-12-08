@@ -9,6 +9,7 @@ using namespace std;
 // Clase para nodo (familiar) del arbol
 
 struct Node {
+    int id;
     string name;
     Node* parent;
     Node* sibling;
@@ -16,7 +17,7 @@ struct Node {
     int numChildren;
     bool printed;
 
-    Node(string n) : name(n), parent(nullptr), sibling(nullptr), children(nullptr), numChildren(0), printed(false) {}
+    Node(int id, string n) : id(id), name(n), parent(nullptr), sibling(nullptr), children(nullptr), numChildren(0), printed(false) {}
 };
 
 // Funcion para añadir un hijo a un nodo
@@ -59,14 +60,14 @@ Node* buildTreeFromCSV(const string& filename) {
 
     // Validar encabezados
     stringstream headerStream(line);
-    string headers[3];
+    string headers[4];
     int headerIndex = 0;
-    while (headerIndex < 3 && getline(headerStream, headers[headerIndex], ';')) {
+    while (headerIndex < 4 && getline(headerStream, headers[headerIndex], ';')) {
         headerIndex++;
     }
 
-    // Orden del encabezado: name, parent, sibling
-    if (headerIndex < 3 || headers[0] != "name" || headers[1] != "parent" || headers[2] != "sibling") {
+    // Orden del encabezado: id, name, parent, sibling
+    if (headerIndex < 4 || headers[0] != "id" || headers[1] != "name" || headers[2] != "parent" || headers[3] != "sibling") {
         cerr << "Encabezados del archivo CSV inválidos." << endl;
         file.close();
         return nullptr;
@@ -78,12 +79,14 @@ Node* buildTreeFromCSV(const string& filename) {
 
     while (getline(file, line)) {
         stringstream ss(line);
-        string name, parentName, siblingName;
+        string idStr, name, parentName, siblingName;
+        getline(ss, idStr, ';');
         getline(ss, name, ';');
         getline(ss, parentName, ';');
         getline(ss, siblingName, ';');
 
-        Node* newNode = new Node(name);
+        int id = stoi(idStr);
+        Node* newNode = new Node(id, name);
 
         // Añadir hijo
         if (!parentName.empty()) {
@@ -153,7 +156,8 @@ void printTree(Node* root, int depth = 0, bool isSibling = false, string prefix 
         } else {
             cout << "+-- ";
         }
-        cout << root->name << endl;
+        // Mostrar el nombre y el ID del nodo
+        cout << root->name << " (ID: " << root->id << ")" << endl;
 
         string childPrefix = prefix + (isSibling ? "|   " : "    ");
         // Imprimir todos los hijos primero
@@ -170,36 +174,65 @@ void printTree(Node* root, int depth = 0, bool isSibling = false, string prefix 
 
 // Funcion para encontrar un nodo y posteriormente agregarlo
 
-Node* findNode(Node* root, const string& name) {
+Node* findNodeById(Node* root, int id) {
+    if (!root) return nullptr;
+    if (root->id == id) return root;
+    Node* found = nullptr;
+    for (int i = 0; i < root->numChildren && !found; ++i) {
+        found = findNodeById(root->children[i], id);
+    }
+    if (!found && root->sibling) {
+        found = findNodeById(root->sibling, id);
+    }
+    return found;
+}
+
+// Funcion para encontrar un nodo por su nombre
+
+Node* findNodeByName(Node* root, const string& name) {
     if (!root) return nullptr;
     if (root->name == name) return root;
     Node* found = nullptr;
     for (int i = 0; i < root->numChildren && !found; ++i) {
-        found = findNode(root->children[i], name);
+        found = findNodeByName(root->children[i], name);
     }
     if (!found && root->sibling) {
-        found = findNode(root->sibling, name);
+        found = findNodeByName(root->sibling, name);
     }
     return found;
 }
 
 // Funcion para modificar un nodo del arbol
 
-void modifyFamilyMember(Node* root, const string& oldName, const string& newName) {
-    Node* node = findNode(root, oldName);
+void modifyFamilyMember(Node* root, int oldId, int newId, const string& newName) {
+    Node* node = findNodeById(root, oldId);
     if (node) {
+        // Verificar si el nuevo ID ya está en uso
+        if (newId != oldId && findNodeById(root, newId)) {
+            cout << "ID ya está en uso. Por favor, elija otro ID." << endl;
+            return;
+        }
+        // Modificar el nodo con el nuevo ID y nombre
+        node->id = newId;
         node->name = newName;
+    } else {
+        cout << "Familiar con el ID proporcionado no encontrado." << endl;
     }
 }
 
 // Funcion para agregar el nodo
 
-void addFamilyMember(Node* root, const string& name, const string& parentName, const string& siblingName) {
-    Node* newNode = new Node(name);
+void addFamilyMember(Node* root, int id, const string& name, const string& parentName, const string& siblingName) {
+    if (findNodeById(root, id)) {
+        cout << "ID ya está en uso. Por favor, elija otro ID." << endl;
+        return;
+    }
+
+    Node* newNode = new Node(id, name);
 
     // Añadir hijo
     if (!parentName.empty()) {
-        Node* parent = findNode(root, parentName);
+        Node* parent = findNodeByName(root, parentName);
         if (parent) {
             addChild(parent, newNode);
         }
@@ -207,7 +240,7 @@ void addFamilyMember(Node* root, const string& name, const string& parentName, c
 
     // Añadir hermano
     if (!siblingName.empty()) {
-        Node* sibling = findNode(root, siblingName);
+        Node* sibling = findNodeByName(root, siblingName);
         if (sibling) {
             addSibling(sibling, newNode);
         }
@@ -237,23 +270,31 @@ void menu(Node* root) {
             printTree(root);
             break;
         case 2: {
+            int id;
             string name, parentName, siblingName;
+            cout << "Ingrese el ID del nuevo familiar: ";
+            cin >> id;
             cout << "Ingrese el nombre del nuevo familiar: ";
             cin >> name;
             cout << "Ingrese el nombre del padre (dejar en blanco si no aplica): ";
-            cin >> parentName;
+            cin.ignore(); // Para evitar problemas al leer nombres con espacios
+            getline(cin, parentName);
             cout << "Ingrese el nombre del hermano (dejar en blanco si no aplica): ";
-            cin >> siblingName;
-            addFamilyMember(root, name, parentName, siblingName);
+            getline(cin, siblingName);
+            addFamilyMember(root, id, name, parentName, siblingName);
             break;
         }
         case 3: {
-            string oldName, newName;
-            cout << "Ingrese el nombre actual del familiar: ";
-            cin >> oldName;
+            int oldId, newId;
+            string newName;
+            cout << "Ingrese el ID actual del familiar: ";
+            cin >> oldId;
+            cout << "Ingrese el nuevo ID del familiar: ";
+            cin >> newId;
             cout << "Ingrese el nuevo nombre del familiar: ";
-            cin >> newName;
-            modifyFamilyMember(root, oldName, newName);
+            cin.ignore(); // Para evitar problemas al leer nombres con espacios
+            getline(cin, newName);
+            modifyFamilyMember(root, oldId, newId, newName);
             break;
         }
         case 4:
