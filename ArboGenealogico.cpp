@@ -24,9 +24,11 @@ struct Node {
 
 string filename="arbolGenealogico.csv";
 
-// Prototipo de la funcion para actualizar el .CSV
+// Prototipo de funciones
 
 void saveTreeToCSV(Node* root, const string& filename);
+void countNodes(Node* node, int& count);
+void collectNodes(Node* node, Node** nodes, int& index);
 
 // Funcion para añadir un hijo a un nodo
 
@@ -228,7 +230,8 @@ void modifyFamilyMember(Node* root, int id, const string& newName) {
 
 // Funcion para agregar el nodo
 
-void addFamilyMember(Node* root, int id, const string& name, const string& parentName, const string& siblingName) {
+void addFamilyMember(Node*& root, int id, const string& name, const string& parentName, const string& siblingName) {
+    cout << "Agregando familiar con ID: " << id << ", Nombre: " << name << endl;
     if (findNodeById(root, id)) {
         cout << "ID ya está en uso. Por favor, elija otro ID." << endl;
         return;
@@ -265,22 +268,30 @@ void addFamilyMember(Node* root, int id, const string& name, const string& paren
 
     // Añadir hijo
     if (parent) {
+        cout << "Añadiendo como hijo de: " << parent->name << endl;
         addChild(parent, newNode);
     }
 
     // Añadir hermano
     if (sibling) {
+        cout << "Añadiendo como hermano de: " << sibling->name << endl;
         addSibling(sibling, newNode);
     }
 
     // Establecer la raíz si no hay padre ni hermano
     if (!parent && !sibling) {
+        cout << "Estableciendo raíz: " << name << endl;
         root = newNode;
     }
 
+    // Verificar la estructura del árbol antes de guardar
+    cout << "Estructura del árbol antes de guardar:" << endl;
+    resetPrintedFlags(root); // Reseteamos las banderas antes de imprimir
+    printTree(root);
+
     // Guardar el árbol actualizado en el archivo CSV
     saveTreeToCSV(root, filename);
-    
+
     cout << "Familiar agregado exitosamente." << endl;
 }
 
@@ -298,9 +309,10 @@ void writeNode(ofstream& file, Node* node) {
     }
 }
 
-// Funcion para guardar el arbol
+// Función para guardar el árbol en un archivo CSV ordenado por ID
 
 void saveTreeToCSV(Node* root, const string& filename) {
+    cout << "Guardando árbol en archivo CSV..." << endl;
     ofstream file(filename);
     if (!file.is_open()) {
         cerr << "Error al abrir el archivo." << endl;
@@ -310,13 +322,78 @@ void saveTreeToCSV(Node* root, const string& filename) {
     // Escribir encabezados
     file << "id;name;parent;sibling\n";
 
-    // Llamar a la función auxiliar para escribir los nodos
-    writeNode(file, root);
+    // Resetear banderas antes de contar nodos y recopilarlos
+    resetPrintedFlags(root);
+
+    // Contar todos los nodos
+    int nodeCount = 0;
+    countNodes(root, nodeCount);
+    cout << "Número de nodos en el árbol: " << nodeCount << endl;
+
+    // Recopilar todos los nodos en un arreglo dinámico
+    Node** nodes = new Node*[nodeCount];
+    int index = 0;
+    resetPrintedFlags(root);  // Resetear banderas antes de recopilar
+    collectNodes(root, nodes, index);
+
+    // Ordenar los nodos por ID usando bubble sort
+    for (int i = 0; i < nodeCount - 1; ++i) {
+        for (int j = 0; j < nodeCount - i - 1; ++j) {
+            if (nodes[j]->id > nodes[j + 1]->id) {
+                Node* temp = nodes[j];
+                nodes[j] = nodes[j + 1];
+                nodes[j + 1] = temp;
+            }
+        }
+    }
+
+    // Escribir los nodos en el archivo
+    for (int i = 0; i < nodeCount; ++i) {
+        Node* node = nodes[i];
+        string parentName = (node->parent) ? node->parent->name : "";
+        string siblingName = (node->sibling) ? node->sibling->name : "";
+        file << node->id << ";" << node->name << ";" << parentName << ";" << siblingName << "\n";
+        cout << "Escribiendo nodo - ID: " << node->id << ", Nombre: " << node->name << endl;
+    }
+
+    // Liberar memoria
+    delete[] nodes;
 
     file.close();
+    cout << "Árbol guardado exitosamente." << endl;
 }
 
-// Funcion para mostrar el menu
+
+// Función auxiliar para contar todos los nodos
+
+void countNodes(Node* node, int& count) {
+    if (node && !node->printed) {  // Solo contar nodos no impresos
+        count++;
+        node->printed = true;  // Marcar el nodo como procesado para no contarlo de nuevo
+        for (int i = 0; i < node->numChildren; ++i) {
+            countNodes(node->children[i], count);
+        }
+        if (node->sibling) {
+            countNodes(node->sibling, count);
+        }
+    }
+}
+
+
+// Función auxiliar para recopilar nodos en un arreglo dinámico sin duplicados
+
+void collectNodes(Node* node, Node** nodes, int& index) {
+    if (node && !node->printed) {  // Solo recopilar nodos no impresos
+        nodes[index++] = node;
+        node->printed = true;  // Marcar el nodo como procesado para no recopilarlo de nuevo
+        for (int i = 0; i < node->numChildren; ++i) {
+            collectNodes(node->children[i], nodes, index);
+        }
+        if (node->sibling) {
+            collectNodes(node->sibling, nodes, index);
+        }
+    }
+}
 
 // Funcion para mostrar el menu
 
@@ -332,7 +409,7 @@ void menu(Node* root) {
 
         switch (option) {
         case 1:
-            resetPrintedFlags(root); // Reseteamos las banderas antes de imprimir
+            resetPrintedFlags(root); // Se resetea las banderas antes de imprimir
             printTree(root);
             break;
         case 2: {
@@ -347,7 +424,7 @@ void menu(Node* root) {
             getline(cin, parentName);
             cout << "Ingrese el nombre del hermano (dejar en blanco si es hijo unico): ";
             getline(cin, siblingName);
-            addFamilyMember(root, id, name, parentName, siblingName); // No pedimos el nombre del hermano
+            addFamilyMember(root, id, name, parentName, siblingName);
             break;
         }
         case 3: {

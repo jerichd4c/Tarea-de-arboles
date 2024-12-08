@@ -12,7 +12,7 @@ NOTA: cuando se refiere a los hermanos se guardan en una lista en el nodo corres
 
 COSAS A AGREGAR:
 
-Arreglar: función modificar y agregar nodo modifican el orden de los IDs de forma incorrecta.
+Arreglar: función UpdateCSV borra el campo de los hermanos en el CSV.
 
 GITHUB:
 
