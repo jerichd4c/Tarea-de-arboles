@@ -12,11 +12,9 @@ NOTA: cuando se refiere a los hermanos se guardan en una lista en el nodo corres
 
 COSAS A AGREGAR:
 
-Arreglar: En el caso de que el usuario seleccione un padre con un hermano pero no seleccione un hermano asignarle el hermano que tiene el padre (el programa crashea). LISTO
+Arreglar: función modificar nodo no puede modificar el ID puesto a ser único.
 
-AGREGARLE: FUNCION PARA ACTUALIZAR ARCHIVO NO ESTA (esta función tiene que trabajar siempre con el mismo archivo).
-
-Cambiar: hacer que el usuario seleccione el archivo en vez de que tenga que escribir el nombre. LISTO
+AGREGARLE: FUNCION PARA ACTUALIZAR ARCHIVO NO ESTA (esta función tiene que trabajar siempre con el mismo archivo). LISTO
 
 GITHUB:
 

@@ -20,6 +20,14 @@ struct Node {
     Node(int id, string n) : id(id), name(n), parent(nullptr), sibling(nullptr), children(nullptr), numChildren(0), printed(false) {}
 };
 
+// Variable global para el arbol
+
+string filename="arbolGenealogico.csv";
+
+// Prototipo de la funcion para actualizar el .CSV
+
+void saveTreeToCSV(Node* root, const string& filename);
+
 // Funcion para añadir un hijo a un nodo
 
 void addChild(Node* parent, Node* child) {
@@ -215,6 +223,11 @@ void modifyFamilyMember(Node* root, int oldId, int newId, const string& newName)
         // Modificar el nodo con el nuevo ID y nombre
         node->id = newId;
         node->name = newName;
+
+        // Guardar el árbol actualizado en el archivo CSV
+        saveTreeToCSV(root, filename);
+        
+        cout << "Familiar modificado exitosamente." << endl;
     } else {
         cout << "Familiar con el ID proporcionado no encontrado." << endl;
     }
@@ -235,7 +248,7 @@ void addFamilyMember(Node* root, int id, const string& name, const string& paren
     if (!parentName.empty()) {
         parent = findNodeByName(root, parentName);
         if (!parent) {
-            cout << "El padre especificado no existe." << endl;
+            cout << "Error: El padre especificado no existe." << endl;
             return;
         }
     }
@@ -244,13 +257,13 @@ void addFamilyMember(Node* root, int id, const string& name, const string& paren
     if (!siblingName.empty()) {
         sibling = findNodeByName(root, siblingName);
         if (!sibling) {
-            cout << "El hermano especificado no existe." << endl;
+            cout << "Error: El hermano especificado no existe." << endl;
             return;
         }
 
         // Validar que el hermano tenga el mismo padre especificado, si se proporciona un nombre de padre
         if (parent && sibling->parent != parent) {
-            cout << "El hermano especificado no tiene el mismo padre que el proporcionado." << endl;
+            cout << "Error: El hermano especificado no tiene el mismo padre que el proporcionado." << endl;
             return;
         }
     }
@@ -272,7 +285,42 @@ void addFamilyMember(Node* root, int id, const string& name, const string& paren
         root = newNode;
     }
 
+    // Guardar el árbol actualizado en el archivo CSV
+    saveTreeToCSV(root, filename);
+    
     cout << "Familiar agregado exitosamente." << endl;
+}
+
+// Funcion auxiliar para guardar nodo en el arbol
+
+void writeNode(ofstream& file, Node* node) {
+    if (node) {
+        string parentName = (node->parent) ? node->parent->name : "";
+        string siblingName = (node->sibling) ? node->sibling->name : "";
+        file << node->id << ";" << node->name << ";" << parentName << ";" << siblingName << "\n";
+
+        for (int i = 0; i < node->numChildren; ++i) {
+            writeNode(file, node->children[i]);
+        }
+    }
+}
+
+// Funcion para guardar el arbol
+
+void saveTreeToCSV(Node* root, const string& filename) {
+    ofstream file(filename);
+    if (!file.is_open()) {
+        cerr << "Error al abrir el archivo." << endl;
+        return;
+    }
+
+    // Escribir encabezados
+    file << "id;name;parent;sibling\n";
+
+    // Llamar a la función auxiliar para escribir los nodos
+    writeNode(file, root);
+
+    file.close();
 }
 
 // Funcion para mostrar el menu
@@ -338,8 +386,6 @@ int main() {
     SetConsoleOutputCP(CP_UTF8); // Establece la salida en UTF-8, caracteres especiales en español
     SetConsoleCP(CP_UTF8);       // Establece la entrada en UTF-8, caracteres especiales en español
     
-    string filename = "arbolGenealogico.csv";
-
     Node* root = buildTreeFromCSV(filename);
 
     if (root) {
